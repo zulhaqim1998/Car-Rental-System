@@ -1,8 +1,7 @@
 
 ## Installation
 
-* `git clone git@github.com:the-road-to-react-with-firebase/react-firestore-authentication.git`
-* `cd react-firestore-authentication`
+* Using cmd in project directory, run:
 * `npm install`
 * `npm start`
 * visit http://localhost:3000
