@@ -1,5 +1,5 @@
 import React from 'react';
-import { withRouter } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import { withFirebase } from '../Firebase';
 import { compose } from 'recompose';
 import Container from '@material-ui/core/Container';
@@ -10,7 +10,9 @@ import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import CardActions from '@material-ui/core/CardActions';
-import Button from '@material-ui/core/Button';
+import { Button } from '@material-ui/core';
+import FilterListIcon from '@material-ui/icons/FilterList';
+import SortIcon from '@material-ui/icons/Sort';
 
 const styles = theme => ({
   icon: {
@@ -43,6 +45,11 @@ const styles = theme => ({
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(6),
   },
+  extraButton: {
+    borderRadius: 50,
+    borderWidth: 2,
+    margin: 10,
+  }
 });
 
 class CarsView extends React.Component {
@@ -53,7 +60,7 @@ class CarsView extends React.Component {
     this.state = {
       carsData: [],
       isLoading: false,
-      carsImages: []
+      carsImages: [],
 
     };
   }
@@ -62,88 +69,75 @@ class CarsView extends React.Component {
     this.getCars();
   }
 
-  getCars = async() => {
+  getCars = async () => {
 
-    this.setState({isLoading: true});
-    const{firebase} = this.props;
+    this.setState({ isLoading: true });
+    const { firebase } = this.props;
     await firebase
       .cars()
       .get()
       .then(querySnapshot => {
         const data = [];
-        const carsImages = [];
         querySnapshot.forEach((doc) => {
           let carData = doc.data();
           carData.id = doc.id;
 
-          firebase.imageRef(carData.image).getDownloadURL().then(url => {
-            // Get the download URL for 'images/stars.jpg'
-            // This can be inserted into an <img> tag
-            // This can also be downloaded directly
-            const carImage = {id: doc.id, url: url};
-            carsImages.push(carImage);
+          firebase.imageRef(carData.id).getDownloadURL().then(url => {
+            this.setState({ [doc.id]: url });
           }).catch(function(error) {
             // Handle any errors
             console.log(error);
           });
           data.push(carData);
         });
-        this.setState({carsData: data, carsImages: JSON.parse(JSON.stringify(carsImages))})
+        this.setState({ carsData: data });
       });
-    this.setState({isLoading: false});
+    this.setState({ isLoading: false });
   };
 
-  // getCarsImageUrl = () => {
-  //
-  // };
-
-
   render() {
-    const {carsData, carsImages} = this.state;
+    const { carsData, carsImages } = this.state;
     const classes = this.props.classes;
 
-    if(carsData.length === 0) {
+    if (carsData.length === 0) {
       return <div/>;
     }
-    console.log(carsImages)
-
 
     return <React.Fragment>
       <Container className={classes.cardGrid} maxWidth="lg">
-        {/* End hero unit */}
+        <div style={{marginBottom: 20}}>
+          <Button className={classes.extraButton} variant="outlined"><FilterListIcon />{' '}Filter</Button>
+          <Button className={classes.extraButton} variant="outlined"><SortIcon />{' '}Sort</Button>
+        </div>
+
         <Grid container spacing={4}>
           {carsData.map((car, index) => (
             <Grid item key={index} xs={6} sm={4} md={3}>
-              <Card className={classes.card}>
-                {/*{console.log(carsImages.find(carImage => carImage.id === car.id))}*/}
-                <CardMedia
-                  className={classes.cardMedia}
-                  // component="img"
-                  //image={this.getImage(car.image) + ''}
-                  // src={car.imageUrl}
-                  //style={{height: 100, width: 400}}
-                  title="Image title"
-                />
-                <CardContent className={classes.cardContent}>
-                  <Typography gutterBottom variant="h5" component="h2">
-                    {car.name}
-                  </Typography>
-                  <Typography>
-                    Brand: {car.brand}
-                  </Typography>
-                  <Typography>
-                    This is a media card. You can use this section to describe the content.
-                  </Typography>
-                </CardContent>
-                <CardActions>
-                  <Button size="small" color="primary">
-                    View
-                  </Button>
-                  <Button size="small" color="primary">
-                    Edit
-                  </Button>
-                </CardActions>
-              </Card>
+              <Link style={{ textDecoration: 'none' }} to={`/cars/${car.id}`}>
+                <Card className={classes.card}
+                      style={{ cursor: 'pointer' }}>
+                  <CardMedia
+                    className={classes.cardMedia}
+                    component="p"
+                    image={this.state[car.id]}
+                  />
+                  <CardContent className={classes.cardContent}>
+                    <Typography gutterBottom variant="h5" component="h2">
+                      {car.name}
+                    </Typography>
+                    <Typography>
+                      {car.transmission}
+                    </Typography>
+                    {car.price && <Typography gutterBottom
+                                              align="right"
+                                              variant="h6"
+                                              display="block"
+                      // style={{ color: 'red', textAlign: 'center' }}
+                                              component="h6">RM {car.price} <sub>/hour</sub></Typography>}
+                  </CardContent>
+
+                </Card>
+              </Link>
             </Grid>
           ))}
         </Grid>

@@ -22,6 +22,15 @@ const useStyles = makeStyles(theme => ({
   title: {
     flexGrow: 1,
   },
+  appBar: {
+    boxShadow: 'none'
+  },
+  button: {
+    marginLeft: 5,
+    marginRight: 5,
+    borderRadius: 20,
+    borderWidth: 3
+  }
 }));
 
 const Navigation = ({ ...props }) => (
@@ -48,13 +57,12 @@ function NewNavigationNonAuth({...props}) {
 
   return (
     <div className={classes.root}>
-      <AppBar position="static">
+      <AppBar position="static" color="white" className={classes.appBar}>
         <Toolbar>
-          {/*<IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">*/}
-          {/*  <MenuIcon/>*/}
-          {/*</IconButton>*/}
           <Typography variant="h6" className={classes.title}>
-            <Link to={ROUTES.LANDING}>AUTOHAVEN</Link>
+            <Link to={ROUTES.LANDING}>
+              <img style={{width: 170}} src={require("../../images/AutoHavenTrans.png")} />
+            </Link>
           </Typography>
 
           {props.authUser ? (
@@ -86,7 +94,7 @@ function NewNavigationNonAuth({...props}) {
                 <MenuItem onClick={() => {
                   props.history.push(ROUTES.HOME);
                   handleClose()
-                }}>Home</MenuItem>
+                }}>Cars</MenuItem>
 
                 <MenuItem onClick={() => {
                   props.history.push(ROUTES.ACCOUNT);
@@ -99,8 +107,8 @@ function NewNavigationNonAuth({...props}) {
               </Menu>
             </div>
           ) : <div>
-            <Link to={ROUTES.SIGN_IN}><Button color="inherit">Login</Button></Link>
-            <Link to={ROUTES.SIGN_UP}><Button color="inherit">Signup</Button></Link>
+            <Link to={ROUTES.SIGN_IN}><Button className={classes.button} variant="outlined" color="inherit">Login</Button></Link>
+            <Link to={ROUTES.SIGN_UP}><Button className={classes.button} variant="outlined" color="inherit">Signup</Button></Link>
           </div>}
         </Toolbar>
       </AppBar>
@@ -108,37 +116,5 @@ function NewNavigationNonAuth({...props}) {
   );
 };
 
-// const NavigationAuth = ({ authUser }) => (
-//   <ul>
-//     <li>
-//       <Link to={ROUTES.LANDING}>Landing</Link>
-//     </li>
-//     <li>
-//       <Link to={ROUTES.HOME}>Home</Link>
-//     </li>
-//     <li>
-//       <Link to={ROUTES.ACCOUNT}>Account</Link>
-//     </li>
-//     {/*{!!authUser.roles[ROLES.ADMIN] && (*/}
-//     {/*  <li>*/}
-//     {/*    <Link to={ROUTES.ADMIN}>Admin</Link>*/}
-//     {/*  </li>*/}
-//     {/*)}*/}
-//     <li>
-//       <SignOutButton/>
-//     </li>
-//   </ul>
-// );
-//
-// const NavigationNonAuth = () => (
-//   <ul>
-//     <li>
-//       <Link to={ROUTES.LANDING}>Landing</Link>
-//     </li>
-//     <li>
-//       <Link to={ROUTES.SIGN_IN}>Sign In</Link>
-//     </li>
-//   </ul>
-// );
 
 export default compose(withRouter, withFirebase)(Navigation);

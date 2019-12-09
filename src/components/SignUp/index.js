@@ -18,7 +18,6 @@ import { withStyles } from '@material-ui/styles';
 
 const SignUpPage = () => (
   <div>
-    {/*<h1>SignUp</h1>*/}
     <SignUpForm />
   </div>
 );
@@ -29,8 +28,8 @@ const INITIAL_STATE = {
   email: '',
   passwordOne: '',
   passwordTwo: '',
-  isAdmin: false,
-  error: null,
+  error: '',
+  disabled: false,
 };
 
 const ERROR_CODE_ACCOUNT_EXISTS = 'auth/email-already-in-use';
@@ -77,6 +76,8 @@ class SignUpFormBase extends Component {
 
   onSubmit = event => {
     const { firstName, lastName, email, passwordOne, passwordTwo } = this.state;
+    event.stopPropagation();
+    event.preventDefault();
 
     const isInvalid =
       passwordOne !== passwordTwo ||
@@ -87,6 +88,7 @@ class SignUpFormBase extends Component {
     if(isInvalid) {
       return alert("Please enter required information.");
     }
+    this.setState({disabled: true});
 
     this.props.firebase
       .doCreateUserWithEmailAndPassword(email, passwordOne)
@@ -113,15 +115,13 @@ class SignUpFormBase extends Component {
         this.setState({ error });
       });
 
+    this.setState({disabled: false});
+
     event.preventDefault();
   };
 
   onChange = event => {
     this.setState({ [event.target.name]: event.target.value });
-  };
-
-  onChangeCheckbox = event => {
-    this.setState({ [event.target.name]: event.target.checked });
   };
 
   render() {
@@ -131,57 +131,11 @@ class SignUpFormBase extends Component {
       email,
       passwordOne,
       passwordTwo,
+      disabled,
+      error
     } = this.state;
 
     const {classes} = this.props;
-    // return (
-    //   <form onSubmit={this.onSubmit}>
-    //     <input
-    //       name="username"
-    //       value={username}
-    //       onChange={this.onChange}
-    //       type="text"
-    //       placeholder="Full Name"
-    //     />
-    //     <input
-    //       name="email"
-    //       value={email}
-    //       onChange={this.onChange}
-    //       type="text"
-    //       placeholder="Email Address"
-    //     />
-    //     <input
-    //       name="passwordOne"
-    //       value={passwordOne}
-    //       onChange={this.onChange}
-    //       type="password"
-    //       placeholder="Password"
-    //     />
-    //     <input
-    //       name="passwordTwo"
-    //       value={passwordTwo}
-    //       onChange={this.onChange}
-    //       type="password"
-    //       placeholder="Confirm Password"
-    //     />
-    //     <label>
-    //       Admin:
-    //       <input
-    //         name="isAdmin"
-    //         type="checkbox"
-    //         checked={isAdmin}
-    //         onChange={this.onChangeCheckbox}
-    //       />
-    //     </label>
-    //     <button disabled={isInvalid} type="submit">
-    //       Sign Up
-    //     </button>
-    //
-    //     {error && <p>{error.message}</p>}
-    //   </form>
-    // );
-
-    // render() {
 
       return (
         <Container component="main" maxWidth="xs">
@@ -267,13 +221,17 @@ class SignUpFormBase extends Component {
               <Button
                 type="submit"
                 fullWidth
-                variant="contained"
-                color="primary"
+                variant="outlined"
+                color="secondary"
                 className={classes.submit}
                 onClick={this.onSubmit}
+                disabled={disabled}
               >
                 Sign Up
               </Button>
+              {error && <Grid item xs>
+                <Typography variant="body2" component="p" color="error">{error.message}</Typography>
+              </Grid>}
               <Grid container>
                 <Grid item>
                   <Link href={ROUTES.SIGN_IN} variant="body2">

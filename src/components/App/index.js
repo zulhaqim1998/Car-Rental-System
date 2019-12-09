@@ -18,7 +18,14 @@ import { ThemeProvider } from '@material-ui/styles';
 import "./app.css";
 import Box from '@material-ui/core/Box';
 import Copyright from '../Copyright';
+import CarDetail from '../CarDetail';
+import CheckoutPage from '../CheckoutPage';
 
+
+
+// color codes:
+//  #A2CEBD light green
+//  #6D7A71 dark green
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -29,10 +36,13 @@ const useStyles = makeStyles(theme => ({
 const theme = createMuiTheme({
   palette: {
     primary: {
-      main: '#47e491',
+      main: '#A2CEBD',
       contrastText: '#fff',
-    }, // Purple and green play nicely together.
-    secondary: { main: '#47e491' }, // This is just green.A700 as hex.
+    },
+    secondary: { main: '#6D7A71' },
+    error: {
+      main: '#dc3122'
+    }
   },
 });
 
@@ -44,7 +54,6 @@ const App = () => {
 
       <Navigation theme={theme}/>
 
-      {/*<hr/>*/}
 
       <Route exact path={ROUTES.LANDING} component={LandingPage}/>
       <Route path={ROUTES.SIGN_UP} component={SignUpPage}/>
@@ -53,6 +62,8 @@ const App = () => {
         path={ROUTES.PASSWORD_FORGET}
         component={PasswordForgetPage}
       />
+      <Route path={ROUTES.CHECKOUT} component={CheckoutPage}/>
+      <Route path={ROUTES.CAR_DETAILS} component={CarDetail}/>
       <Route path={ROUTES.HOME} component={HomePage}/>
       <Route path={ROUTES.ACCOUNT} component={AccountPage}/>
       <Route path={ROUTES.ADMIN} component={AdminPage}/>
@@ -63,27 +74,6 @@ const App = () => {
     </div>
   </ThemeProvider>
   </Router>;
-}
-
-// const App = () => (
-//   <Router>
-//     <div  className={classes.root}>
-//       <Navigation />
-//
-//       <hr />
-//
-//       <Route exact path={ROUTES.LANDING} component={LandingPage} />
-//       <Route path={ROUTES.SIGN_UP} component={SignUpPage} />
-//       <Route path={ROUTES.SIGN_IN} component={SignInPage} />
-//       <Route
-//         path={ROUTES.PASSWORD_FORGET}
-//         component={PasswordForgetPage}
-//       />
-//       <Route path={ROUTES.HOME} component={HomePage} />
-//       <Route path={ROUTES.ACCOUNT} component={AccountPage} />
-//       <Route path={ROUTES.ADMIN} component={AdminPage} />
-//     </div>
-//   </Router>
-// );
+};
 
 export default withAuthentication(App);

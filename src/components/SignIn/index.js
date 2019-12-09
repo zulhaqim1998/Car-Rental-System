@@ -31,7 +31,8 @@ const SignInPage = () => (
 const INITIAL_STATE = {
   email: '',
   password: '',
-  error: null,
+  error: '',
+  disabled: false
 };
 
 const ERROR_CODE_ACCOUNT_EXISTS =
@@ -61,7 +62,7 @@ const styles = theme => ({
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: '100%', // Fix IE 11 issue.
+    width: '100%',
     marginTop: theme.spacing(1),
   },
   submit: {
@@ -76,20 +77,24 @@ class SignInFormBase extends Component {
     this.state = { ...INITIAL_STATE };
   }
 
-  onSubmit = event => {
+  onSubmit = async(event) => {
+    event.stopPropagation();
+    event.preventDefault();
     const { email, password } = this.state;
 
-    this.props.firebase
+    if(email === '' || password === '') {
+      return alert("please enter required information.");
+    }
+
+    this.setState({disabled: true});
+
+    await this.props.firebase
       .doSignInWithEmailAndPassword(email, password)
       .then(() => {
-        this.setState({ ...INITIAL_STATE });
+        this.setState({ ...INITIAL_STATE, disabled: false });
         this.props.history.push(ROUTES.HOME);
       })
-      .catch(error => {
-        this.setState({ error });
-      });
-
-    event.preventDefault();
+      .catch(error => this.setState({ error: error, disabled: false }));
   };
 
   onChange = event => {
@@ -97,7 +102,7 @@ class SignInFormBase extends Component {
   };
 
   render() {
-    const { email, password, error } = this.state;
+    const { email, password, disabled, error } = this.state;
     const { classes } = this.props;
 
     return (
@@ -110,7 +115,7 @@ class SignInFormBase extends Component {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <form className={classes.form} noValidate>
+          <div className={classes.form}>
             <TextField
               variant="outlined"
               margin="normal"
@@ -138,16 +143,21 @@ class SignInFormBase extends Component {
               onChange={this.onChange}
             />
             <Button
-              type="submit"
               fullWidth
-              variant="contained"
-              color="primary"
+              type="submit"
+              variant="outlined"
+              color="secondary"
               className={classes.submit}
               onClick={this.onSubmit}
+              disabled={disabled}
             >
               Sign In
             </Button>
+            {error && <Grid item xs>
+              <Typography variant="body2" component="p" color="error">{error.message}</Typography>
+            </Grid>}
             <Grid container>
+
               <Grid item xs>
                 <Link href="#" variant="body2">
                   Forgot password?
@@ -159,34 +169,10 @@ class SignInFormBase extends Component {
                 </Link>
               </Grid>
             </Grid>
-          </form>
+          </div>
         </div>
       </Container>
     );
-
-    // return (
-    //   <form onSubmit={this.onSubmit}>
-    //     <input
-    //       name="email"
-    //       value={email}
-    //       onChange={this.onChange}
-    //       type="text"
-    //       placeholder="Email Address"
-    //     />
-    //     <input
-    //       name="password"
-    //       value={password}
-    //       onChange={this.onChange}
-    //       type="password"
-    //       placeholder="Password"
-    //     />
-    //     <button disabled={isInvalid} type="submit">
-    //       Sign In
-    //     </button>
-    //
-    //     {error && <p>{error.message}</p>}
-    //   </form>
-    // );
   }
 }
 
@@ -336,73 +322,6 @@ class SignInTwitterBase extends Component {
     );
   }
 }
-
-// const SignIn = () => {
-//   const classes = useStyles();
-//
-//   return (
-//     <Container component="main" maxWidth="xs">
-//       <CssBaseline />
-//       <div className={classes.paper}>
-//         <Avatar className={classes.avatar}>
-//           <LockOutlinedIcon />
-//         </Avatar>
-//         <Typography component="h1" variant="h5">
-//           Sign in
-//         </Typography>
-//         <form className={classes.form} noValidate>
-//           <TextField
-//             variant="outlined"
-//             margin="normal"
-//             required
-//             fullWidth
-//             id="email"
-//             label="Email Address"
-//             name="email"
-//             autoComplete="email"
-//             autoFocus
-//           />
-//           <TextField
-//             variant="outlined"
-//             margin="normal"
-//             required
-//             fullWidth
-//             name="password"
-//             label="Password"
-//             type="password"
-//             id="password"
-//             autoComplete="current-password"
-//           />
-//           <FormControlLabel
-//             control={<Checkbox value="remember" color="primary" />}
-//             label="Remember me"
-//           />
-//           <Button
-//             type="submit"
-//             fullWidth
-//             variant="contained"
-//             color="primary"
-//             className={classes.submit}
-//           >
-//             Sign In
-//           </Button>
-//           <Grid container>
-//             <Grid item xs>
-//               <Link href="#" variant="body2">
-//                 Forgot password?
-//               </Link>
-//             </Grid>
-//             <Grid item>
-//               <Link href={ROUTES.SIGN_UP} variant="body2">
-//                 {"Don't have an account? Sign Up"}
-//               </Link>
-//             </Grid>
-//           </Grid>
-//         </form>
-//       </div>
-//     </Container>
-//   );
-// };
 
 const SignInForm = compose(
   withRouter,

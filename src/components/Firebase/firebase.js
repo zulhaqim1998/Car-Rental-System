@@ -99,17 +99,17 @@ class Firebase {
       }
     });
 
-  // *** User API ***
   user = uid => this.db.doc(`users/${uid}`);
   users = () => this.db.collection('users');
 
-  // *** Message API ***
   message = uid => this.db.doc(`messages/${uid}`);
   messages = () => this.db.collection('messages');
 
-  // *** Message API ***
   car = uid => this.db.doc(`cars/${uid}`);
   cars = () => this.db.collection('cars');
+
+  receipt = uid => this.db.doc(`receipts/${uid}`);
+  receipts = () => this.db.collection('receipts');
 
   // *** Images Storage API ***
   //imagesRef = this.storageRef.child('images');
